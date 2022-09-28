@@ -42,7 +42,9 @@
     "onCommand:sortLines.sortLinesNatural",
     "onCommand:sortLines.sortLinesUnique",
     "onCommand:sortLines.removeDuplicateLines",
-    "onCommand:sortLines.sortLinesShuffle"
+    "onCommand:sortLines.sortLinesShuffle",
+    "onCommand:sortLines.timestamp",
+    "onCommand:sortLines.sortByDate"
   ],
   "main": "./out/extension",
   "browser": "./dist/web/extension.js",
@@ -95,6 +97,14 @@
       {
         "command": "sortLines.sortLinesShuffle",
         "title": "Sort lines (shuffle)"
+      },
+      {
+        "command": "sortLines.timestamp",
+        "title": "Sort lines (timestamp in Syslog)"
+      },
+      {
+        "command": "sortLines.sortByDate",
+        "title": "Sort lines (sort by date in Syslog)"
       }
     ],
     "configuration": {

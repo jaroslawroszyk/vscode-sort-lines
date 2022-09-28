@@ -12,15 +12,22 @@ function makeSorter(algorithm?: SortingAlgorithm): ArrayTransformer {
 function sortActiveSelection(transformers: ArrayTransformer[]): Thenable<boolean> | undefined {
   const textEditor = vscode.window.activeTextEditor;
   if (!textEditor) {
+    vscode.window.showErrorMessage('The source file is too large,\nTry with a smaller one.');
     return undefined;
   }
   const selection = textEditor.selection;
+
+  if(selection.isEmpty)
+  {
+    vscode.window.showErrorMessage('You probably did not select any text to be sorted');
+  }
 
   if (selection.isEmpty && vscode.workspace.getConfiguration('sortLines').get('sortEntireFile') === true) {
     return sortLines(textEditor, 0, textEditor.document.lineCount - 1, transformers);
   }
 
   if (selection.isSingleLine) {
+    vscode.window.showErrorMessage('Will not work with single line!');
     return undefined;
   }
   return sortLines(textEditor, selection.start.line, selection.end.line, transformers);
@@ -119,6 +126,38 @@ function shuffleSorter(lines: string[]): string[] {
     return lines;
 }
 
+function timestampCompare(a: string, b: string): number
+{
+  var firstIndex = a.indexOf('<');
+  var secondIndex = b.indexOf('<');
+  if (firstIndex < 0 || secondIndex < 0){
+    return 0;
+  }
+
+  var findFirstTimestamp = a.substring(firstIndex, firstIndex+30);
+  var findSecoundTimestamp = b.substring(secondIndex, secondIndex+30);
+  if (findFirstTimestamp === findSecoundTimestamp) {
+    return 0;
+  }
+  return findFirstTimestamp < findSecoundTimestamp ? -1 : 1;
+}
+
+function dateCompare(a: string, b: string) : number
+{
+  var firstIndex = a.indexOf('<');
+  var secondIndex = b.indexOf('<');
+  if (firstIndex < 0 || secondIndex < 0){
+    return 0;
+  }
+
+  var findFirstDate = a.substring(firstIndex, firstIndex+10);
+  var findSecoundDate = b.substring(secondIndex, secondIndex+10);
+  if (findFirstDate === findSecoundDate) {
+    return 0;
+  }
+  return findFirstDate < findSecoundDate ? -1 : 1;
+}
+
 const transformerSequences = {
   sortNormal: [makeSorter()],
   sortUnique: [makeSorter(), removeDuplicates],
@@ -131,7 +170,9 @@ const transformerSequences = {
   sortVariableLengthReverse: [makeSorter(variableLengthReverseCompare)],
   sortNatural: [makeSorter(naturalCompare)],
   sortShuffle: [shuffleSorter],
-  removeDuplicateLines: [removeDuplicates]
+  removeDuplicateLines: [removeDuplicates],
+  timestamp: [makeSorter(timestampCompare)],
+  sortDate : [makeSorter(dateCompare)]
 };
 
 export const sortNormal = () => sortActiveSelection(transformerSequences.sortNormal);
@@ -146,3 +187,5 @@ export const sortVariableLengthReverse = () => sortActiveSelection(transformerSe
 export const sortNatural = () => sortActiveSelection(transformerSequences.sortNatural);
 export const sortShuffle = () => sortActiveSelection(transformerSequences.sortShuffle);
 export const removeDuplicateLines = () => sortActiveSelection(transformerSequences.removeDuplicateLines);
+export const timestamp = () => sortActiveSelection(transformerSequences.timestamp);
+export const sortByDate = () => sortActiveSelection(transformerSequences.sortDate);
