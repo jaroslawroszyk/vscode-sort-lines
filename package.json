@@ -2,7 +2,7 @@
   "name": "sort-lines",
   "displayName": "Sort lines",
   "description": "Sorts lines of text",
-  "version": "0.0.1",
+  "version": "1.9.2",
   "engines": {
     "vscode": "^1.71.0"
   },
